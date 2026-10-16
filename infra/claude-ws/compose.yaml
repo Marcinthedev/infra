@@ -1,0 +1,24 @@
+# Stack "claude-ws" w Portainerze: Stacks -> Add stack -> Repository,
+# Compose path: claude-ws/compose.yaml
+services:
+  claude:
+    image: ghcr.io/${GH_OWNER}/claude-ws:latest
+    container_name: claude-ws
+    hostname: claude-ws
+    restart: unless-stopped
+    environment:
+      RC_NAME: ${RC_NAME:-docker-workstation}
+      RC_CAPACITY: ${RC_CAPACITY:-4}
+    volumes:
+      - claude-config:/home/dev/.claude   # logowanie Claude'a, zaufanie katalogów
+      - gh-config:/home/dev/.config/gh    # logowanie gh
+      - workspace:/workspace              # repozytoria
+      - pw-cache:/home/dev/.cache/ms-playwright
+    # Celowo bez /var/run/docker.sock i bez kluczy chmurowych:
+    # deploy idzie wyłącznie przez GitHub -> GHCR -> Portainer.
+
+volumes:
+  claude-config:
+  gh-config:
+  workspace:
+  pw-cache:

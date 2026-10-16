@@ -1,0 +1,19 @@
+# Wspólny stack dla każdej apki webowej, na stage i prod.
+# W Portainerze: Stacks -> Add stack -> Repository (repo infra),
+# Compose path: stacks/web-app/compose.yaml, nazwa stacka np. "sklep-stage".
+# Zmienne stacka:
+#   GH_OWNER=<twój login>  APP_NAME=sklep  IMAGE_TAG=stage|prod
+#   APP_PORT=8081 (stage) / 8080 (prod)   DATABASE_URL=...  (+ inne sekrety apki)
+# GitOps updates: Polling 5m, Re-pull image ON, Force redeployment ON.
+# Apka, która potrzebuje czegoś więcej (np. własnej bazy), dostaje własny
+# plik stacks/<apka>/compose.yaml w tym samym repo.
+services:
+  app:
+    image: ghcr.io/${GH_OWNER}/${APP_NAME}:${IMAGE_TAG}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      APP_ENV: ${IMAGE_TAG}
+      DATABASE_URL: ${DATABASE_URL:-}
+    ports:
+      - "${APP_PORT}:3000"
